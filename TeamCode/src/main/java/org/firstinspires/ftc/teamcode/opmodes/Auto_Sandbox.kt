@@ -6,17 +6,16 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous
 import org.firstinspires.ftc.teamcode.math.Pose2D
 import org.firstinspires.ftc.teamcode.robot.WoENrobot.delay
 import org.firstinspires.ftc.teamcode.robot.WoENrobot.movement
+import kotlin.math.PI
 
 @Autonomous
 class Auto_Sandbox : AutoOpMode() {
     override fun main() {
-        movement.pos(Pose2D(50.0, -100.0, Math.toRadians(0.0)))
-        movement.pos(Pose2D(50.0, 100.0, Math.toRadians(180.0)))
-        movement.pos(Pose2D(50.0, -100.0, Math.toRadians(180.0)))
-        movement.pos(Pose2D(50.0, -100.0, Math.toRadians(0.0)))
-        movement.pos(startPosition)
         while (opModeIsActive()) {
-            delay(1.0)
+            //movement.pos(Pose2D(startPosition.x, startPosition.y+200.0, 0.0))
+            movement.pos(Pose2D(startPosition.x, startPosition.y+20.0, PI/2))
+            movement.pos(Pose2D(startPosition.x, startPosition.y+20.0, 0.0))
+            // shootPOWERSHOTAngle()
         }
     }
 }

@@ -6,37 +6,37 @@ import com.qualcomm.robotcore.hardware.Servo
 import com.qualcomm.robotcore.util.ElapsedTime
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit
-import org.firstinspires.ftc.teamcode.superclasses.MultithreadRobotModule
+import org.firstinspires.ftc.teamcode.superclasses.MultithreadedRobotModule
 import org.openftc.revextensions2.ExpansionHubEx
 import org.openftc.revextensions2.ExpansionHubMotor
 
-class AI : MultithreadRobotModule() {
-    private val AItime = ElapsedTime()
-    private val AItimeControlHub = ElapsedTime()
-    private val AItimeExpansionHub = ElapsedTime()
+class AI : MultithreadedRobotModule() {
+    private val aiTime = ElapsedTime()
+    private val aiTimeControlHub = ElapsedTime()
+    private val aiTimeExpansionHub = ElapsedTime()
     private val timeDiagnostic = 1000.0
     private val timeWait = 500.0
-    private lateinit var OdometryYL: ExpansionHubMotor
-    private lateinit var OdometryYR: ExpansionHubMotor
-    private lateinit var Conveyorm: ExpansionHubMotor
-    private lateinit var ShooterMotor: ExpansionHubMotor
-    private lateinit var DriveFrontLeft: ExpansionHubMotor
-    private lateinit var DriveFrontRight: ExpansionHubMotor
-    private lateinit var DriveRearLeft: ExpansionHubMotor
-    private lateinit var DriveRearRight: ExpansionHubMotor
+    private lateinit var odometerYL: ExpansionHubMotor
+    private lateinit var odometerYR: ExpansionHubMotor
+    private lateinit var conveyorm: ExpansionHubMotor
+    private lateinit var shooterMotor: ExpansionHubMotor
+    private lateinit var driveFrontLeft: ExpansionHubMotor
+    private lateinit var driveFrontRight: ExpansionHubMotor
+    private lateinit var driveRearLeft: ExpansionHubMotor
+    private lateinit var driveRearRight: ExpansionHubMotor
 
     override fun initialize() {
-        OdometryYL = WoENHardware.odometerYL
-        OdometryYR = WoENHardware.odometerYR
-        Conveyorm = WoENHardware.conveyorMotor
-        ShooterMotor = WoENHardware.shooterMotor
-        DriveFrontLeft = WoENHardware.driveFrontLeft
-        DriveFrontRight = WoENHardware.driveFrontRight
-        DriveRearLeft = WoENHardware.driveRearLeft
-        DriveRearRight = WoENHardware.driveRearRight
-        AItime.reset()
-        AItimeExpansionHub.reset()
-        AItimeControlHub.reset()
+        odometerYL = WoENHardware.odometerYL
+        odometerYR = WoENHardware.odometerYR
+        conveyorm = WoENHardware.conveyorMotor
+        shooterMotor = WoENHardware.shooterMotor
+        driveFrontLeft = WoENHardware.driveFrontLeft
+        driveFrontRight = WoENHardware.driveFrontRight
+        driveRearLeft = WoENHardware.driveRearLeft
+        driveRearRight = WoENHardware.driveRearRight
+        aiTime.reset()
+        aiTimeExpansionHub.reset()
+        aiTimeControlHub.reset()
     }
 
 
@@ -44,19 +44,19 @@ class AI : MultithreadRobotModule() {
     }
 
     override fun updateControlHub() {
-        /*  if (AItimeControlHub.milliseconds() > timeDiagnostic) {
-              AItimeControlHub.reset()
-              if (tempMotor(DriveFrontLeft) || tempMotor(DriveFrontRight) || tempMotor(DriveRearLeft) || tempMotor(DriveRearRight)) {
-                  opMode.telemetry.addData("Warning!", "owerHeadControlHub")
+        /*  if (aiTimeControlHub.milliseconds() > timeDiagnostic) {
+              aiTimeControlHub.reset()
+              if (tempMotor(driveFrontLeft) || tempMotor(driveFrontRight) || tempMotor(driveRearLeft) || tempMotor(driveRearRight)) {
+                  opMode.telemetry.addData("Warning!", "overHeadControlHub")
               }
           }*/
     }
 
     override fun updateExpansionHub() {
-        /*if (AItimeExpansionHub.milliseconds() > timeDiagnostic){
-            AItimeExpansionHub.reset()
-            if (tempMotor(Conveyorm) || tempMotor(ShooterMotor) || tempMotor(OdometryYL) || tempMotor(OdometryYR)){
-                opMode.telemetry.addData("Warning!", "owerHeadExpansionHub")
+        /*if (aiTimeExpansionHub.milliseconds() > timeDiagnostic){
+            aiTimeExpansionHub.reset()
+            if (tempMotor(conveyorm) || tempMotor(ShooterMotor) || tempMotor(OdometerYL) || tempMotor(OdometerYR)){
+                opMode.telemetry.addData("Warning!", "overHeadExpansionHub")
             }
         }*/
     }
@@ -65,14 +65,14 @@ class AI : MultithreadRobotModule() {
         return motor.isBridgeOverTemp
     }
 
-    fun diagnositcServo(servo: Servo, startPos: Double, endPos: Double) {
-        AItime.reset()
+    fun diagnosticServo(servo: Servo, startPos: Double, endPos: Double) {
+        aiTime.reset()
         servo.position = startPos
-        while (opMode.opModeIsActive() && AItime.milliseconds() < timeDiagnostic / 2) {
+        while (opMode.opModeIsActive() && aiTime.milliseconds() < timeDiagnostic / 2) {
             Thread.yield()
         }
         servo.position = endPos
-        while (opMode.opModeIsActive() && AItime.milliseconds() < timeDiagnostic) {
+        while (opMode.opModeIsActive() && aiTime.milliseconds() < timeDiagnostic) {
             Thread.yield()
         }
     }
@@ -102,14 +102,14 @@ class AI : MultithreadRobotModule() {
     }
 
     fun diagnosticMotor(motor: DcMotorEx): Boolean {
-        AItime.reset()
+        aiTime.reset()
         motor.power = 1.0
         do {
-            if (motor.getCurrent(CurrentUnit.AMPS) > 0.5 && AItime.milliseconds() > timeWait) {
+            if (motor.getCurrent(CurrentUnit.AMPS) > 0.5 && aiTime.milliseconds() > timeWait) {
                 motor.power = 0.0
                 return true
             }
-        } while (opMode.opModeIsActive() && AItime.milliseconds() < timeDiagnostic)
+        } while (opMode.opModeIsActive() && aiTime.milliseconds() < timeDiagnostic)
         motor.power = 0.0
         return false
     }

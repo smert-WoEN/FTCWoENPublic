@@ -7,18 +7,18 @@ import com.qualcomm.robotcore.hardware.Servo
 import com.qualcomm.robotcore.util.ElapsedTime
 import org.firstinspires.ftc.teamcode.robot.WoENHardware
 import org.firstinspires.ftc.teamcode.robot.WoENHardware.gripper
-import org.firstinspires.ftc.teamcode.superclasses.MultithreadRobotModule
+import org.firstinspires.ftc.teamcode.superclasses.MultithreadedRobotModule
 import org.firstinspires.ftc.teamcode.superclasses.WobbleManipulator
 import kotlin.math.abs
 
 @Deprecated("")
-class MotorWobbleManipulator : MultithreadRobotModule(), WobbleManipulator {
+class MotorWobbleManipulator : MultithreadedRobotModule(), WobbleManipulator {
     private val closeClose = 0.73
     private val closeOpen = 0.19
-    private val minerror = 15.0
-    private val maxspeed = 0.7
+    private val minError = 15.0
+    private val maxSpeed = 0.7
     private val kofP = 0.0015
-    private val kofd = 0.00001
+    private val kofD = 0.00001
     private val leverTime = ElapsedTime()
     private lateinit var lever: DcMotorEx
     private lateinit var close: Servo
@@ -46,21 +46,21 @@ class MotorWobbleManipulator : MultithreadRobotModule(), WobbleManipulator {
     override fun updateControlHub() {
     }
 
-    override fun grabWobble(dograb: Boolean) {
-        if (dograb != isGrabbed) {
-            isGrabbed = dograb
-            if (dograb) close.position = closeClose else close.position = closeOpen
+    override fun grabWobble(doGrab: Boolean) {
+        if (doGrab != isGrabbed) {
+            isGrabbed = doGrab
+            if (doGrab) close.position = closeClose else close.position = closeOpen
         }
     }
 
     override fun updateExpansionHub() {
         error = pos - lever.currentPosition
-        if (abs(error) > minerror) {
+        if (abs(error) > minError) {
             p = error * kofP
-            d = (error - errorOld) * kofd
+            d = (error - errorOld) * kofD
             power = p + d
-            if (power > maxspeed) power = maxspeed
-            if (power < -maxspeed) power = -maxspeed
+            if (power > maxSpeed) power = maxSpeed
+            if (power < -maxSpeed) power = -maxSpeed
             if (oldpower != power) {
                 lever.power = power
                 oldpower = power
@@ -78,8 +78,8 @@ class MotorWobbleManipulator : MultithreadRobotModule(), WobbleManipulator {
     override fun updateOther() {
     }
 
-    override fun upmediumdown(upmedium: Boolean, updown: Boolean) {
-        if (upmedium && !updown) {
+    override fun upMediumDown(upMedium: Boolean, upDown: Boolean) {
+        if (upMedium && !upDown) {
             if (!ismed) {
                 ismed = true
                 if (posangle.toInt() == 1) {
@@ -91,7 +91,7 @@ class MotorWobbleManipulator : MultithreadRobotModule(), WobbleManipulator {
                 }
             }
         } else ismed = false
-        if (updown && !upmedium) {
+        if (upDown && !upMedium) {
             if (!isdown) {
                 isdown = true
                 if (posangle.toInt() == 2) {
@@ -107,13 +107,13 @@ class MotorWobbleManipulator : MultithreadRobotModule(), WobbleManipulator {
 
     override fun setAngle(Positions: WobbleManipulator.Position) {
         when (Positions) {
-            WobbleManipulator.Position.UP -> setposlever(0.0)
-            WobbleManipulator.Position.DOWN -> setposlever(920.0)
-            WobbleManipulator.Position.MEDIUM -> setposlever(550.0)
+             WobbleManipulator.Position.UP -> setPosLever(0.0)
+             WobbleManipulator.Position.DOWN -> setPosLever(920.0)
+             WobbleManipulator.Position.MEDIUM -> setPosLever(550.0)
         }
     }
 
-    fun setposlever(Pos: Double) {
+    fun setPosLever(Pos: Double) {
         pos = Pos
     }
 }

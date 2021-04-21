@@ -4,7 +4,6 @@ import java.text.SimpleDateFormat
 // build.gradle in FtcRobotController
 //
 apply plugin: 'com.android.library'
-apply plugin: 'kotlin-android'
 
 android {
 
@@ -21,8 +20,8 @@ android {
         sourceCompatibility "1.8"
         targetCompatibility "1.8"
     }
-    ndkVersion '22.0.7026061'
-    buildToolsVersion '30.0.3'
+    ndkVersion '22.1.7171670'
+    buildToolsVersion '31.0.0 rc2'
 }
 
 repositories {
@@ -37,6 +36,5 @@ repositories {
 apply from: '../build.dependencies.gradle'
 
 dependencies {
-    implementation 'androidx.core:core-ktx:1.5.0-beta02'
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:${kotlin_version}"
+    implementation 'androidx.preference:preference:1.1.1'
 }

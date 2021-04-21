@@ -6,6 +6,8 @@ import org.firstinspires.ftc.teamcode.robot.ServoWobbleManipulator.WobbleServoPo
 import org.firstinspires.ftc.teamcode.robot.ServoWobbleManipulator.WobbleServoPositions.angleUp
 import org.firstinspires.ftc.teamcode.robot.ServoWobbleManipulator.WobbleServoPositions.gripperClose
 import org.firstinspires.ftc.teamcode.robot.ServoWobbleManipulator.WobbleServoPositions.gripperOpen
+import org.firstinspires.ftc.teamcode.robot.Shooter.ShooterConfig.feederClose
+import org.firstinspires.ftc.teamcode.robot.Shooter.ShooterConfig.feederOpen
 import org.firstinspires.ftc.teamcode.robot.WoENHardware.conveyorMotor
 import org.firstinspires.ftc.teamcode.robot.WoENHardware.driveFrontLeft
 import org.firstinspires.ftc.teamcode.robot.WoENHardware.driveFrontRight
@@ -21,8 +23,6 @@ import org.firstinspires.ftc.teamcode.robot.WoENHardware.shooterMotor
 import org.firstinspires.ftc.teamcode.robot.WoENrobot.ai
 import org.firstinspires.ftc.teamcode.robot.WoENrobot.forceInitRobot
 import org.firstinspires.ftc.teamcode.robot.WoENrobot.startRobot
-import org.firstinspires.ftc.teamcode.robot.Shooter.ShooterConfig.feederClose
-import org.firstinspires.ftc.teamcode.robot.Shooter.ShooterConfig.feederOpen
 
 @TeleOp
 class Diagnostic : LinearOpMode() {
@@ -40,8 +40,8 @@ class Diagnostic : LinearOpMode() {
         telemetry.addData("RingDetector", ai.diagnosticRange(ringDetector))
         telemetry.addData("See Servo", "")
         telemetry.update()
-        ai.diagnositcServo(feeder, feederOpen, feederClose)
-        ai.diagnositcServo(leverArm, angleDown, angleUp)
-        ai.diagnositcServo(gripper, gripperOpen, gripperClose)
+        ai.diagnosticServo(feeder, feederOpen, feederClose)
+        ai.diagnosticServo(leverArm, angleDown, angleUp)
+        ai.diagnosticServo(gripper, gripperOpen, gripperClose)
     }
 }

@@ -45,9 +45,8 @@ object WoENHardware {
 
 
     @JvmOverloads
-    fun assignHardware(
-        hwMap: HardwareMap = OpModeManagerImpl.getOpModeManagerOfActivity(AppUtil.getInstance().rootActivity).hardwareMap
-    ) {
+    fun assignHardware(hwMap: HardwareMap = OpModeManagerImpl.getOpModeManagerOfActivity(
+         AppUtil.getInstance().rootActivity).hardwareMap) {
 
         hardwareMap = hwMap
 
@@ -56,23 +55,17 @@ object WoENHardware {
         controlHub = hardwareMap.get(ExpansionHubEx::class.java, "Control Hub")
         expansionHub = hardwareMap.get(ExpansionHubEx::class.java, "Expansion Hub 2")
 
-        controlHubVoltageSensor =
-            LynxVoltageSensor(hardwareMap.appContext, controlHub.standardModule)
-        expansionHubVoltageSensor =
-            LynxVoltageSensor(hardwareMap.appContext, expansionHub.standardModule)
+        controlHubVoltageSensor = LynxVoltageSensor(hardwareMap.appContext, controlHub.standardModule)
+        expansionHubVoltageSensor = LynxVoltageSensor(hardwareMap.appContext, expansionHub.standardModule)
 
-        driveFrontLeft =
-            hardwareMap.get(DcMotorEx::class.java, "driveFrontLeft") as ExpansionHubMotor
-        driveFrontRight =
-            hardwareMap.get(DcMotorEx::class.java, "driveFrontRight") as ExpansionHubMotor
+        driveFrontLeft = hardwareMap.get(DcMotorEx::class.java, "driveFrontLeft") as ExpansionHubMotor
+        driveFrontRight = hardwareMap.get(DcMotorEx::class.java, "driveFrontRight") as ExpansionHubMotor
         driveRearLeft = hardwareMap.get(DcMotorEx::class.java, "driveRearLeft") as ExpansionHubMotor
-        driveRearRight =
-            hardwareMap.get(DcMotorEx::class.java, "driveRearRight") as ExpansionHubMotor
+        driveRearRight = hardwareMap.get(DcMotorEx::class.java, "driveRearRight") as ExpansionHubMotor
         odometerYL = hardwareMap.get(DcMotorEx::class.java, "odometerYL") as ExpansionHubMotor
         odometerYR = hardwareMap.get(DcMotorEx::class.java, "odometerYR") as ExpansionHubMotor
         odometerX = hardwareMap.get(DcMotorEx::class.java, "odometerXConveyor") as ExpansionHubMotor
-        conveyorMotor =
-            hardwareMap.get(DcMotorEx::class.java, "odometerXConveyor") as ExpansionHubMotor
+        conveyorMotor = hardwareMap.get(DcMotorEx::class.java, "odometerXConveyor") as ExpansionHubMotor
         shooterMotor = hardwareMap.get(DcMotorEx::class.java, "shooterMotor") as ExpansionHubMotor
         lever = hardwareMap.get(DcMotorEx::class.java, "odometerYR") as ExpansionHubMotor
         ledStrip1 = hardwareMap.get(DcMotorEx::class.java, "odometerYR") as ExpansionHubMotor

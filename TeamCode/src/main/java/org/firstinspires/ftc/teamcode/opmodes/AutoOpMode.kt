@@ -34,23 +34,21 @@ open class AutoOpMode : LinearOpMode() {
     private fun startLoop() {
         val color = HSVRGB.convert((runTime.seconds() * 50).toFloat() % 360, 100f, 50f)
         setLedColors(color.x.toInt(), color.y.toInt(), color.z.toInt())
-        val indicator =
-            if (runTime.seconds() % 1 > 0.5) if (runTime.seconds() % 1 > 0.75) "/" else "|" else if (runTime.seconds() % 1 > 0.25) "—" else "\\"
-        telemetry.addLine("Use gamedad 1 X/B to select alliance color, dpad L/R to select alliance side, dpad UP/DOWN to change starting delay. $indicator")
+        val indicator = if (runTime.seconds() % 1 > 0.5) if (runTime.seconds() % 1 > 0.75) "/" else "|" else if (runTime.seconds() % 1 > 0.25) "—" else "\\"
+        telemetry.addLine(
+            "Use gamepad 1 X/B to select alliance color, dpad L/R to select alliance side, dpad UP/DOWN to change starting delay. $indicator")
         xSign = if (gamepad1.b) 1 else if (gamepad1.x) -1 else xSign
-        sideSign =
-            if (gamepad1.dpad_right || gamepad1.left_stick_x > 0.5) 1 else if (gamepad1.dpad_left || gamepad1.left_stick_x < -0.5) -1 else sideSign
+        sideSign = if (gamepad1.dpad_right || gamepad1.left_stick_x > 0.5) 1 else if (gamepad1.dpad_left || gamepad1.left_stick_x < -0.5) -1 else sideSign
         delayAtStart = Range.clip(
             delayAtStart + (if (delayAtStartIncrementPresser.get()) 500 else 0) - if (delayAtStartDecrementPresser.get()) 500 else 0,
-            0.0,
-            30000.0
-        )
+            0.0, 30000.0)
         telemetry.addData("Alliance", if (xSign == 1) "RED" else "BLUE")
         telemetry.addData("Tape Side", if (sideSign == 1) "RIGHT" else "LEFT")
         telemetry.addData("Starting delay [ms]", delayAtStart)
         telemetry.addLine("")
         thereAreTwoGamepads = gamepad2.start || gamepad2.b || thereAreTwoGamepads
         telemetry.addData("OpenCV Stack size", openCVNode.stackSize)
+        //dashboardPacket.put("OpenCV Stack size", openCVNode.stackSize)
         if (thereAreTwoGamepads) telemetry.addLine("Second gamepad detected")
         telemetry.update()
     }

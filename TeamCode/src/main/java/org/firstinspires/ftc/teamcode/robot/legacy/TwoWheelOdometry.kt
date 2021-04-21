@@ -1,25 +1,7 @@
 package org.firstinspires.ftc.teamcode.robot.legacy
 
-import com.qualcomm.hardware.bosch.BNO055IMU
-import com.qualcomm.robotcore.util.ElapsedTime
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit
-import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder
-import org.firstinspires.ftc.robotcore.external.navigation.AxesReference
-import org.firstinspires.ftc.teamcode.math.MathUtil
-import org.firstinspires.ftc.teamcode.math.Pose2D
-import org.firstinspires.ftc.teamcode.math.Vector2D
-import org.firstinspires.ftc.teamcode.math.Vector3D
-import org.firstinspires.ftc.teamcode.robot.WoENHardware
-import org.firstinspires.ftc.teamcode.robot.WoENHardware.imu2
-import org.firstinspires.ftc.teamcode.robot.WoENrobot.delay
-import org.firstinspires.ftc.teamcode.superclasses.MultithreadRobotModule
-import org.firstinspires.ftc.teamcode.superclasses.Odometry
-import org.openftc.revextensions2.ExpansionHubEx
-import org.openftc.revextensions2.RevBulkData
-import kotlin.math.cos
-
 @Deprecated("")
-class TwoWheelOdometry : MultithreadRobotModule(), Odometry {
+class TwoWheelOdometry {/*: MultithreadRobotModule(), Odometry {
     private val odometryWheelDiameterCm = 4.8
     private val odometryCountsPerCM = 1440 / (odometryWheelDiameterCm * Math.PI)
     private val odometryCMPerCounts = odometryWheelDiameterCm * Math.PI / 1440
@@ -147,5 +129,5 @@ class TwoWheelOdometry : MultithreadRobotModule(), Odometry {
                 ((-bulkData.getMotorVelocity(odometerY)).toDouble() - angularVelocity * odometerXcenterOffset) * odometryCMPerCounts
             ).rotatedCW(worldPosition.heading), angularVelocity
         )
-    }
+    }*/
 }

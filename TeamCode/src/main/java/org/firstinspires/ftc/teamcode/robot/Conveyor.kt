@@ -9,24 +9,23 @@ import com.qualcomm.robotcore.util.ElapsedTime
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit
 import org.firstinspires.ftc.teamcode.misc.CommandSender
-import org.firstinspires.ftc.teamcode.misc.motorAccelerationLimiter
-import org.firstinspires.ftc.teamcode.robot.Conveyor.ConveyorConfig.conveyorPower
+import org.firstinspires.ftc.teamcode.misc.MotorAccelerationLimiter
+import org.firstinspires.ftc.teamcode.robot.Conveyor.ConveyorConfig.ratedConveyorPower
 import org.firstinspires.ftc.teamcode.robot.WoENHardware.conveyorMotor
 import org.firstinspires.ftc.teamcode.robot.WoENHardware.ringDetector
 import org.firstinspires.ftc.teamcode.superclasses.Conveyor
-import org.firstinspires.ftc.teamcode.superclasses.MultithreadRobotModule
+import org.firstinspires.ftc.teamcode.superclasses.MultithreadedRobotModule
 import kotlin.math.abs
 
-class Conveyor : MultithreadRobotModule(),
-    Conveyor {
+class Conveyor : MultithreadedRobotModule(), Conveyor {
     private lateinit var conveyor: DcMotorEx
     private lateinit var sensorDistance: DistanceSensor
     private val distanceQueryTimeout = 300.0
     private val motorCurrentQueryTimeout = 100.0
 
-    private val conveyorPowerSender = CommandSender {conveyor.power = it}
+    private val conveyorPowerSender = CommandSender({ conveyor.power = it })
 
-    private val conveyorAccelerationLimiter = motorAccelerationLimiter({conveyorPowerSender.send(it)}, 6.0)
+    private val conveyorAccelerationLimiter = MotorAccelerationLimiter({ conveyorPowerSender.send(it) }, 6.0) //motorAccelerationLimiter({conveyorPowerSender.send(it)}, 6.0)
 
     private val motorCurrentTimer = ElapsedTime()
     private val stackDetectionTimer = ElapsedTime()
@@ -39,43 +38,35 @@ class Conveyor : MultithreadRobotModule(),
     private val motorCurrentQueryTimer = ElapsedTime()
     override var enableFullStackStopping = true
     override var reverseBeforeStop = true
-    private var requestedPower = 0.0
 
     @Config
     internal object ConveyorConfig {
-        @JvmField
-        var conveyorPower = 1.0
-        @JvmField
-        var motorLockingCurrentTimeout = 800.0
-        @JvmField
-        var motorLockingReverseTime = 600.0
-        @JvmField
-        var stackDetectionTimeout = 1000.0
-        @JvmField
-        var stackDetectionReverseTime = 600.0
-        @JvmField
-        var distanceThreshold = 5.46
-        @JvmField
-        var currentThreshold = 2.5
+        @JvmField var ratedConveyorPower = 1.0
+        @JvmField var motorLockingCurrentTimeout = 800.0
+        @JvmField var motorLockingReverseTime = 600.0
+        @JvmField var stackDetectionTimeout = 1000.0
+        @JvmField var stackDetectionReverseTime = 600.0
+        @JvmField var distanceThreshold = 5.46
+        @JvmField var currentThreshold = 4.0
     }
 
     override fun initialize() {
-        initializecolor()
-        initializedrive()
+        initializeColor()
+        initializeDrive()
     }
 
-    private fun initializecolor() {
+    private fun initializeColor() {
         sensorDistance = ringDetector
     }
 
-    private fun initializedrive() {
+    private fun initializeDrive() {
         conveyor = conveyorMotor
         conveyor.direction = DcMotorSimple.Direction.REVERSE //Should be intaking rings at +1.0
         conveyor.mode = DcMotor.RunMode.RUN_WITHOUT_ENCODER
     }
 
 
-    private fun getdistance(): Double {
+    private fun getDistance(): Double {
         if (distanceQueryTimer.milliseconds() > distanceQueryTimeout) {
             lastKnownDistance = sensorDistance.getDistance(DistanceUnit.CM)
             distanceQueryTimer.reset()
@@ -83,8 +74,9 @@ class Conveyor : MultithreadRobotModule(),
         return lastKnownDistance
     }
 
-    private val aMPS: Double
+    private val conveyorMotorCurrent: Double
         get() {
+            if (!enableConveyor && !forceReverse) return 0.0
             if (motorCurrentQueryTimer.milliseconds() > motorCurrentQueryTimeout) {
                 lastKnownMotorCurrent = abs(conveyor.getCurrent(CurrentUnit.AMPS))
                 motorCurrentQueryTimer.reset()
@@ -93,35 +85,33 @@ class Conveyor : MultithreadRobotModule(),
         }
 
     override fun updateControlHub() {
-        if (!forceReverse && !(reverseBeforeStop && requestedPower == 0.0) && enableFullStackStopping)
-            if (getdistance() >= ConveyorConfig.distanceThreshold) {
+        if (!forceReverse && !(reverseBeforeStop && !enableConveyor) && enableFullStackStopping) if (getDistance() >= ConveyorConfig.distanceThreshold) {
             stackDetectionTimer.reset() //Full collector detection
         }
     }
 
-    val collectorIsFull : Boolean
-        get() = stackDetectionTimer.milliseconds() > ConveyorConfig.stackDetectionTimeout && !forceReverse && enableFullStackStopping && requestedPower != 0.0
+    val collectorIsFull: Boolean
+        get() = stackDetectionTimer.milliseconds() > ConveyorConfig.stackDetectionTimeout && !forceReverse && enableFullStackStopping && enableConveyor
     val motorIsLocked: Boolean
-        get() = motorCurrentTimer.milliseconds() > ConveyorConfig.motorLockingCurrentTimeout && !forceReverse && stackDetectionTimer.milliseconds() < ConveyorConfig.stackDetectionTimeout && requestedPower != 0.0
+        get() = motorCurrentTimer.milliseconds() > ConveyorConfig.motorLockingCurrentTimeout && !forceReverse && stackDetectionTimer.milliseconds() < ConveyorConfig.stackDetectionTimeout && enableConveyor
 
     override fun updateExpansionHub() {
         if (!forceReverse) {
-            if ((stackDetectionTimer.milliseconds() > ConveyorConfig.stackDetectionTimeout || reverseBeforeStop && requestedPower == 0.0) && enableFullStackStopping) { //reverse+stop in case of ring detection
+            if ((stackDetectionTimer.milliseconds() > ConveyorConfig.stackDetectionTimeout || reverseBeforeStop && !enableConveyor) && enableFullStackStopping) { //reverse+stop in case of ring detection
                 motorCurrentTimer.reset()
-                currentMotorPower =
-                    if (stackDetectionTimer.milliseconds() < ConveyorConfig.stackDetectionTimeout + ConveyorConfig.stackDetectionReverseTime && reverseBeforeStop) -1.0 else 0.0
+                currentMotorPower = if (stackDetectionTimer.milliseconds() < ConveyorConfig.stackDetectionTimeout + ConveyorConfig.stackDetectionReverseTime && reverseBeforeStop) -1.0 else 0.0
             } else if (motorCurrentTimer.milliseconds() > ConveyorConfig.motorLockingCurrentTimeout) //reverse after locking
             {
                 if (motorCurrentTimer.milliseconds() < ConveyorConfig.motorLockingReverseTime + ConveyorConfig.motorLockingCurrentTimeout) {
-                    currentMotorPower = - if(enableConveyor) conveyorPower else 0.0
+                    currentMotorPower = -if (enableConveyor) ratedConveyorPower else 0.0
                 } else motorCurrentTimer.reset()
             } else {
-                currentMotorPower = + if(enableConveyor) conveyorPower else 0.0
-                if (aMPS < ConveyorConfig.currentThreshold) //locking detection
+                currentMotorPower = +if (enableConveyor) ratedConveyorPower else 0.0
+                if (conveyorMotorCurrent < ConveyorConfig.currentThreshold) //locking detection
                     motorCurrentTimer.reset()
             }
         } else {
-            currentMotorPower = -1.0
+            currentMotorPower = -ratedConveyorPower
             motorCurrentTimer.reset()
         }
         conveyorAccelerationLimiter.setVelocity(currentMotorPower)

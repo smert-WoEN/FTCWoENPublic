@@ -8,21 +8,13 @@ import org.openftc.easyopencv.OpenCvInternalCamera
 class OpenCVNodePhonecam : OpenCVNodeWebcam() {
     override fun initialize() {
         try {
-            webcam = OpenCvCameraFactory.getInstance().createInternalCamera(
-                OpenCvInternalCamera.CameraDirection.BACK,
-                opMode.hardwareMap.appContext.resources.getIdentifier(
-                    "cameraMonitorViewId",
-                    "id",
-                    opMode.hardwareMap.appContext.packageName
-                )
-            ) as OpenCvInternalCamera
+            webcam = OpenCvCameraFactory.getInstance().createInternalCamera(OpenCvInternalCamera.CameraDirection.BACK,
+                                                                            opMode.hardwareMap.appContext.resources.getIdentifier(
+                                                                                 "cameraMonitorViewId", "id",
+                                                                                 opMode.hardwareMap.appContext.packageName)) as OpenCvInternalCamera
             webcam.setPipeline(pipeline)
             webcam.openCameraDeviceAsync {
-                webcam.startStreaming(
-                    rows,
-                    cols,
-                    OpenCvCameraRotation.SIDEWAYS_LEFT
-                )
+                webcam.startStreaming(rows, cols, OpenCvCameraRotation.SIDEWAYS_LEFT)
             }
         } catch (e: Exception) {
             opMode.telemetry.addData("OpenCVNode Error", e.message)

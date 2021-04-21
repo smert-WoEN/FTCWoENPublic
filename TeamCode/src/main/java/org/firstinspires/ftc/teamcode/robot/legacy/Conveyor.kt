@@ -11,24 +11,23 @@ import org.firstinspires.ftc.teamcode.misc.CommandSender
 import org.firstinspires.ftc.teamcode.robot.WoENHardware.conveyorMotor
 import org.firstinspires.ftc.teamcode.robot.WoENHardware.ringDetector
 import org.firstinspires.ftc.teamcode.superclasses.Conveyor
-import org.firstinspires.ftc.teamcode.superclasses.MultithreadRobotModule
+import org.firstinspires.ftc.teamcode.superclasses.MultithreadedRobotModule
 
 @Deprecated("")
-class Conveyor() : MultithreadRobotModule(),
-    Conveyor {
+class Conveyor : MultithreadedRobotModule(), Conveyor {
     private val conveyorTime = ElapsedTime()
     private val backOnTime = ElapsedTime()
     private val pauseTime = ElapsedTime()
-    private val backOnAftertime = ElapsedTime()
+    private val backOnAfterTime = ElapsedTime()
     private lateinit var conveyorm: DcMotorEx
     override var enableConveyor = false
-    set(value) {
-        field = value
-        conveyorPower = if (value) 1.0 else 0.0
-    }
+        set(value) {
+            field = value
+            conveyorPower = if (value) 1.0 else 0.0
+        }
 
     private lateinit var sensorDistance: DistanceSensor
-    private val conveyorPowerSender = CommandSender { p: Double -> conveyorm.power = -p }
+    private val conveyorPowerSender = CommandSender({ p: Double -> conveyorm.power = -p })
     private var full = false
     private var backOn = false
     private var stop = false
@@ -40,8 +39,8 @@ class Conveyor() : MultithreadRobotModule(),
     private var distance = 0.0
     private var current = 0.0
     override fun initialize() {
-        initializecolor()
-        initializedrive()
+        initializeColor()
+        initializeDrive()
     }
 
     override fun start() {
@@ -51,17 +50,17 @@ class Conveyor() : MultithreadRobotModule(),
         conveyorPower = 0.0
     }
 
-    private fun initializecolor() {
+    private fun initializeColor() {
         sensorDistance = ringDetector
     }
 
-    private fun initializedrive() {
+    private fun initializeDrive() {
         conveyorm = conveyorMotor
         conveyorm.direction = DcMotorSimple.Direction.FORWARD
         conveyorm.mode = DcMotor.RunMode.RUN_WITHOUT_ENCODER
     }
 
-    private fun getdistance(): Double {
+    private fun getDistance(): Double {
         //return 10;
         return sensorDistance.getDistance(DistanceUnit.CM)
     }
@@ -69,7 +68,7 @@ class Conveyor() : MultithreadRobotModule(),
     override fun updateControlHub() {
         if (pauseTime.milliseconds() >= 100) {
             pauseTime.reset()
-            distance = if (!this.enableFullStackStopping) getdistance() else 10.0
+            distance = if (!this.enableFullStackStopping) getDistance() else 10.0
         }
     }
 
@@ -94,7 +93,7 @@ class Conveyor() : MultithreadRobotModule(),
                         backOn = true
                     }
                     timelock = backOnTime.milliseconds()
-                    backOnAftertime.reset()
+                    backOnAfterTime.reset()
                 } else {
                     if (backOn && backOnTime.milliseconds() >= timelock + 500) {
                         backOnTime.reset()
@@ -104,7 +103,7 @@ class Conveyor() : MultithreadRobotModule(),
                 }
             } else {
                 if (stop) {
-                    if (this.reverseBeforeStop && backOnAftertime.milliseconds() < 500) setConveyorMotorPower(-conveyorPower) else {
+                    if (this.reverseBeforeStop && backOnAfterTime.milliseconds() < 500) setConveyorMotorPower(-conveyorPower) else {
                         setConveyorMotorPower(0.0)
                         stop = false
                         backOn = false

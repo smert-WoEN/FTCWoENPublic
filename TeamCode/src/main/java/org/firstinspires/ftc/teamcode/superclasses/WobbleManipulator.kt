@@ -6,6 +6,6 @@ interface WobbleManipulator {
     }
 
     fun setAngle(Positions: Position)
-    fun grabWobble(dograb: Boolean)
-    fun upmediumdown(upmedium: Boolean, updown: Boolean)
+    fun grabWobble(doGrab: Boolean)
+    fun upMediumDown(upMedium: Boolean, upDown: Boolean)
 }
